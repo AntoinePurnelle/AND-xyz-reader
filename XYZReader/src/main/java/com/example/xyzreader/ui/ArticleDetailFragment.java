@@ -21,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.android.volley.VolleyError;
@@ -51,12 +52,10 @@ public class ArticleDetailFragment extends Fragment implements
     private static final float PARALLAX_FACTOR = 1.25f;
     @BindView(R.id.detail_image_iv)
     ImageView detailImageIv;
-    /*@BindView(R.id.article_title)
-    TextView articleTitle;*/
     @BindView(R.id.article_byline)
     TextView articleByline;
-    /*@BindView(R.id.meta_bar)
-    LinearLayout metaBar;*/
+    @BindView(R.id.pb_loading_indicator)
+    ProgressBar progressBar;
     @BindView(R.id.detail_toolbar)
     Toolbar detailToolbar;
     @BindView(R.id.detail_collapsing_toolbar)
@@ -72,12 +71,6 @@ public class ArticleDetailFragment extends Fragment implements
     private Cursor mCursor;
     private long mItemId;
     private View mRootView;
-    private int mMutedColor = 0xFF333333;
-
-    private int mTopInset;
-    private int mScrollY;
-    private boolean mIsCard = false;
-    private int mStatusBarFullOpacityBottom;
 
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.sss");
     // Use default locale format
@@ -104,28 +97,16 @@ public class ArticleDetailFragment extends Fragment implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (getArguments().containsKey(ARG_ITEM_ID)) {
+        if (getArguments().containsKey(ARG_ITEM_ID))
             mItemId = getArguments().getLong(ARG_ITEM_ID);
-        }
 
-        mIsCard = getResources().getBoolean(R.bool.detail_is_card);
-        mStatusBarFullOpacityBottom = getResources().getDimensionPixelSize(
-                R.dimen.detail_card_top_margin);
         setHasOptionsMenu(true);
-    }
-
-    public ArticleDetailActivity getActivityCast() {
-        return (ArticleDetailActivity) getActivity();
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        // In support library r8, calling initLoader for a fragment in a FragmentPagerAdapter in
-        // the fragment's onCreate may cause the same LoaderManager to be dealt to multiple
-        // fragments because their mIndex is -1 (haven't been added to the activity yet). Thus,
-        // we do this in onActivityCreated.
         getLoaderManager().initLoader(0, null, this);
     }
 
@@ -136,6 +117,11 @@ public class ArticleDetailFragment extends Fragment implements
 
         unbinder = ButterKnife.bind(this, mRootView);
         bindViews();
+
+        detailToolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
+        detailToolbar.setNavigationOnClickListener(v -> {
+            getActivity().onBackPressed(); // Implemented by activity
+        });
         return mRootView;
     }
 
@@ -156,7 +142,6 @@ public class ArticleDetailFragment extends Fragment implements
 
         if (mCursor != null) {
             detailToolbar.setTitle(mCursor.getString(ArticleLoader.Query.TITLE));
-            /*articleTitle.setText(mCursor.getString(ArticleLoader.Query.TITLE));*/
             Date publishedDate = parsePublishedDate();
             if (!publishedDate.before(START_OF_EPOCH.getTime())) {
                 articleByline.setText(Html.fromHtml(
@@ -194,21 +179,19 @@ public class ArticleDetailFragment extends Fragment implements
 
                         }
                     });
-        } else {
-            /*articleTitle.setText("N/A");*/
-            articleByline.setText("N/A");
-            articleBody.setText("N/A");
         }
     }
 
     @NonNull
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+        progressBar.setVisibility(View.VISIBLE);
         return ArticleLoader.newInstanceForItemId(getActivity(), mItemId);
     }
 
     @Override
     public void onLoadFinished(@NonNull Loader<Cursor> cursorLoader, Cursor cursor) {
+        progressBar.setVisibility(View.GONE);
         if (!isAdded()) {
             if (cursor != null) {
                 cursor.close();

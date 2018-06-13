@@ -8,5 +8,6 @@
     <dimen name="fab_press_translation_z">6dp</dimen>
     <dimen name="fab_margin">24dp</dimen>
     <dimen name="articleBylinePadding">16dp</dimen>
+    <dimen name="loading_indicator_size">42dp</dimen>
 
 </resources>

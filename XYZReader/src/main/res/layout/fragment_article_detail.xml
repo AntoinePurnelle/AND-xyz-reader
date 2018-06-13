@@ -39,7 +39,7 @@
             app:expandedTitleMarginEnd="40dp"
             app:expandedTitleMarginStart="40dp"
             app:expandedTitleTextAppearance="@style/ExpandedTitle"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed">
+            app:layout_scrollFlags="scroll|enterAlways">
 
             <ImageView
                 android:id="@+id/detail_image_iv"
@@ -60,7 +60,6 @@
     </android.support.design.widget.AppBarLayout>
 
 
-
     <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -76,10 +75,10 @@
                 android:id="@+id/article_byline"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                tools:text="Book Date\nBook Author"
-                android:textSize="16sp"
                 android:layout_gravity="center"
-                android:padding="@dimen/articleBylinePadding"/>
+                android:padding="@dimen/articleBylinePadding"
+                android:textSize="16sp"
+                tools:text="Book Date\nBook Author" />
 
             <com.example.xyzreader.ui.MaxWidthLinearLayout
                 android:layout_width="match_parent"
@@ -124,5 +123,12 @@ Sed elementum ornare orci eget molestie. Donec eget lacinia est. Nulla eu pharet
         android:src="@drawable/ic_share"
         app:layout_anchor="@id/appBarLayout"
         app:layout_anchorGravity="right|bottom" />
+
+    <ProgressBar
+        android:id="@+id/pb_loading_indicator"
+        android:layout_width="@dimen/loading_indicator_size"
+        android:layout_height="@dimen/loading_indicator_size"
+        android:layout_gravity="center"
+        android:visibility="gone" />
 
 </android.support.design.widget.CoordinatorLayout>
